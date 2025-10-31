@@ -1,13 +1,15 @@
+/* src/index.css */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+html, body, #root { height: 100%; }
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  background-color: #f2e5ae; /* Pale Yellow */
+  font-family: 'Poppins', sans-serif;
+  color: #000000;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
-}
+/* small helpers */
+.container-centered { max-width: 980px; margin: 24px auto; padding: 16px; }
+.import-textarea { width: 100%; min-height: 180px; font-family: monospace; font-size: 13px; padding: 12px; border-radius: 8px; border: 1px solid rgba(0,0,0,0.1); }
+.subject-row { padding: 10px; border-radius: 8px; background: #fff; margin-bottom: 8px; border-left: 6px solid #9e0807; }
