@@ -121,7 +121,6 @@ export default function ImportData({ onCreateMany, disableImport = false }) {
         <Box display="flex" justifyContent="flex-end">
           <Button
             variant="contained"
-            // disabled={disabledText || disableImport}
             onClick={handleImport}
             sx={{
               bgcolor: "#9e0807",
