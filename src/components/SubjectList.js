@@ -36,14 +36,15 @@ export default function SubjectList({
     return new Set((addedIds || []).map((id) => String(id)));
   });
 
-  // keep addedSet entries only for existing items (cleanup when dataList changes)
+  // Sync local state with addedIds prop when it changes (for external updates like X button removal)
+  // Also filter to only include valid item IDs
   useEffect(() => {
     const validIds = new Set(items.map((it) => String(it.data_id ?? `${it.subject_code}-${it.section || ""}`)));
-    setAddedSet((prev) => {
-      const next = new Set([...prev].filter((id) => validIds.has(id)));
-      return next;
-    });
-  }, [items]);
+    const propIds = new Set((addedIds || []).map((id) => String(id)));
+    // Only keep IDs that are both in propIds and validIds
+    const syncedIds = new Set([...propIds].filter((id) => validIds.has(id)));
+    setAddedSet(syncedIds);
+  }, [addedIds, items]);
 
   const toggleAdded = (it) => {
     const id = String(it.data_id ?? `${it.subject_code}-${it.section || ""}`);
@@ -322,6 +323,7 @@ export default function SubjectList({
                             size="small"
                             startIcon={isAdded ? null : <AddIcon sx={{ fontSize: 18 }} />}
                             onClick={() => toggleAdded(it)}
+                            disabled={is_closed === true}
                             sx={{
                               textTransform: "none",
                               fontWeight: 700,
