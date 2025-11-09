@@ -60,11 +60,33 @@ export default function Dashboard() {
     (id) => {
       handleDeleteData(id);
       removeSubjectFromSchedules(id);
+      // Remove from added subjects if it was added
+      setAddedSubjectIds((prev) => {
+        const next = new Set(prev);
+        next.delete(String(id));
+        return next;
+      });
     },
     [handleDeleteData, removeSubjectFromSchedules]
   );
 
   const openSubjects = useMemo(() => (dataList || []).filter((d) => !d.is_closed), [dataList]);
+
+  // Track added subjects for the schedule
+  const [addedSubjectIds, setAddedSubjectIds] = useState(new Set());
+
+  const handleSubjectAdd = useCallback((item, isAdded) => {
+    const id = String(item.data_id ?? `${item.subject_code}-${item.section || ""}`);
+    setAddedSubjectIds((prev) => {
+      const next = new Set(prev);
+      if (isAdded) {
+        next.add(id);
+      } else {
+        next.delete(id);
+      }
+      return next;
+    });
+  }, []);
 
   const [snackOpen, setSnackOpen] = useState(false);
   const [snackMsg, setSnackMsg] = useState("");
@@ -100,6 +122,8 @@ export default function Dashboard() {
         removeSubjectFromSchedules(id);
       }
     });
+    // Clear added subjects
+    setAddedSubjectIds(new Set());
     setSnackMsg(`Deleted ${dataList.length} subject(s)`);
     setSnackSeverity("success");
     setSnackOpen(true);
@@ -157,6 +181,8 @@ export default function Dashboard() {
                 schedules={scheduleList}
                 onSaveSchedule={handleSaveSchedule}
                 onDeleteSchedule={handleDeleteSchedule}
+                addedSubjectIds={Array.from(addedSubjectIds)}
+                onRemoveSubject={handleSubjectAdd}
               />
             </Box>
           </Box>
@@ -179,6 +205,8 @@ export default function Dashboard() {
               dataList={dataList}
               onEdit={handleEditOpen}
               onDelete={handleDeleteDataWrapper}
+              onAdd={handleSubjectAdd}
+              addedIds={Array.from(addedSubjectIds)}
               onGenerate={() => console.log("Generate Schedule clicked")}
               onClear={handleClearAll}
               totalImported={dataList.length}
@@ -410,6 +438,8 @@ export default function App() {
         removeSubjectFromSchedules(id);
       }
     });
+    // Clear added subjects
+    setAddedSubjectIds(new Set());
     setSnackMsg(`Deleted ${dataList.length} subject(s)`);
     setSnackSeverity("success");
     setSnackOpen(true);
