@@ -74,6 +74,9 @@ export default function Dashboard() {
 
   // Track added subjects for the schedule
   const [addedSubjectIds, setAddedSubjectIds] = useState(new Set());
+  
+  // Track Schedule box height to match SubjectList
+  const [scheduleHeight, setScheduleHeight] = useState(null);
 
   const handleSubjectAdd = useCallback((item, isAdded) => {
     const id = String(item.data_id ?? `${item.subject_code}-${item.section || ""}`);
@@ -183,6 +186,7 @@ export default function Dashboard() {
                 onDeleteSchedule={handleDeleteSchedule}
                 addedSubjectIds={Array.from(addedSubjectIds)}
                 onRemoveSubject={handleSubjectAdd}
+                onHeightChange={setScheduleHeight}
               />
             </Box>
           </Box>
@@ -194,8 +198,9 @@ export default function Dashboard() {
               borderRadius: 3,
               boxShadow: "0 1px 8px rgba(0,0,0,0.12)",
               p: 2.5,
-              minHeight: 640,
-              maxHeight: 640,
+              height: scheduleHeight ? `${scheduleHeight}px` : "640px",
+              minHeight: scheduleHeight ? `${scheduleHeight}px` : 640,
+              maxHeight: scheduleHeight ? `${scheduleHeight}px` : 640,
               overflowY: "auto",
               width: "100%",
               boxSizing: "border-box",
