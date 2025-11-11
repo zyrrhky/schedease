@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback } from "react";
+import React, { useMemo, useState, useCallback, useRef, useEffect } from "react";
 import {
   Paper,
   Box,
@@ -15,6 +15,15 @@ import {
   Stack,
   Divider,
   IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
+  FormControl,
+  FormLabel,
 } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
@@ -185,10 +194,15 @@ export default function Schedule({
   onDeleteSchedule,
   addedSubjectIds = [], // Array of subject IDs that are added to the schedule
   onRemoveSubject, // Callback to remove a subject from the schedule (item, isAdded)
+  onHeightChange, // Callback to notify parent of height changes
 }) {
   const [scheduleName, setScheduleName] = useState("");
   const [isSaved, setIsSaved] = useState(false);
   const [lastSavedTime, setLastSavedTime] = useState(null);
+  const [exportDialogOpen, setExportDialogOpen] = useState(false);
+  const [exportFormat, setExportFormat] = useState(""); // "pdf", "image", or ""
+  const scheduleContainerRef = useRef(null);
+  const schedulePaperRef = useRef(null); // Ref for the main timetable Paper for export
 
   // Create lookup map for subjects (supports both data_id and subject_code-section format)
   const lookup = useMemo(() => {
@@ -279,31 +293,163 @@ export default function Schedule({
     }, 3000);
   }, [scheduleName, addedSubjectIds, onSaveSchedule]);
 
-  // Handle export schedule
-  const handleExportSchedule = useCallback(() => {
-    const exportData = {
-      scheduleName: scheduleName || "Untitled Schedule",
-      subjects: addedSubjects.map((s) => ({
-        subject_code: s.subject_code,
-        subject_title: s.subject_title,
-        section: s.section,
-        schedule: s.schedule,
-        room: s.room,
-      })),
-      exportedAt: new Date().toISOString(),
-    };
-    
-    const dataStr = JSON.stringify(exportData, null, 2);
-    const dataBlob = new Blob([dataStr], { type: "application/json" });
-    const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `${scheduleName || "schedule"}_${new Date().toISOString().split("T")[0]}.json`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  }, [scheduleName, addedSubjects]);
+  // Notify parent of height changes
+  useEffect(() => {
+    if (scheduleContainerRef.current && onHeightChange) {
+      const height = scheduleContainerRef.current.offsetHeight;
+      onHeightChange(height);
+      
+      // Also listen for resize events
+      const resizeObserver = new ResizeObserver(() => {
+        if (scheduleContainerRef.current) {
+          const newHeight = scheduleContainerRef.current.offsetHeight;
+          onHeightChange(newHeight);
+        }
+      });
+      
+      resizeObserver.observe(scheduleContainerRef.current);
+      
+      return () => {
+        resizeObserver.disconnect();
+      };
+    }
+  }, [onHeightChange]);
+
+  // Handle opening export dialog
+  const handleOpenExportDialog = useCallback(() => {
+    setExportDialogOpen(true);
+    setExportFormat(""); // Reset to empty - user must select an option
+  }, []);
+
+  // Handle closing export dialog
+  const handleCloseExportDialog = useCallback(() => {
+    setExportDialogOpen(false);
+    setExportFormat("");
+  }, []);
+
+  // Handle export as PDF
+  const handleExportPDF = useCallback(async () => {
+    if (!schedulePaperRef.current) {
+      alert("Unable to export: Schedule content not found.");
+      return;
+    }
+
+    try {
+      // Dynamically import jsPDF
+      const { default: jsPDF } = await import("jspdf");
+      
+      // Temporarily hide the "X" buttons for export
+      const removeButtons = schedulePaperRef.current.querySelectorAll(".remove-button");
+      const originalDisplays = [];
+      removeButtons.forEach((btn) => {
+        if (btn instanceof HTMLElement) {
+          originalDisplays.push(btn.style.display);
+          btn.style.display = "none";
+        }
+      });
+
+      // Use html2canvas to capture the schedule
+      const { default: html2canvas } = await import("html2canvas");
+      const canvas = await html2canvas(schedulePaperRef.current, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+      });
+
+      // Restore "X" buttons
+      removeButtons.forEach((btn, idx) => {
+        if (btn instanceof HTMLElement) {
+          btn.style.display = originalDisplays[idx] || "";
+        }
+      });
+
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF("landscape", "mm", "a4");
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+      const imgX = (pdfWidth - imgWidth * ratio) / 2;
+      const imgY = (pdfHeight - imgHeight * ratio) / 2;
+
+      // Add schedule name at the top
+      pdf.setFontSize(16);
+      pdf.text(scheduleName || "Untitled Schedule", pdfWidth / 2, 15, { align: "center" });
+
+      pdf.addImage(imgData, "PNG", imgX, imgY + 10, imgWidth * ratio, imgHeight * ratio);
+      pdf.save(`${scheduleName || "schedule"}_${new Date().toISOString().split("T")[0]}.pdf`);
+
+      setExportDialogOpen(false);
+      setExportFormat("");
+    } catch (error) {
+      console.error("Error exporting PDF:", error);
+      alert("Failed to export PDF. Please ensure jsPDF and html2canvas are installed.");
+    }
+  }, [scheduleName]);
+
+  // Handle export as Image
+  const handleExportImage = useCallback(async () => {
+    if (!schedulePaperRef.current) {
+      alert("Unable to export: Schedule content not found.");
+      return;
+    }
+
+    try {
+      // Temporarily hide the "X" buttons for export
+      const removeButtons = schedulePaperRef.current.querySelectorAll(".remove-button");
+      const originalDisplays = [];
+      removeButtons.forEach((btn) => {
+        if (btn instanceof HTMLElement) {
+          originalDisplays.push(btn.style.display);
+          btn.style.display = "none";
+        }
+      });
+
+      // Use html2canvas to capture the schedule
+      const { default: html2canvas } = await import("html2canvas");
+      const canvas = await html2canvas(schedulePaperRef.current, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+      });
+
+      // Restore "X" buttons
+      removeButtons.forEach((btn, idx) => {
+        if (btn instanceof HTMLElement) {
+          btn.style.display = originalDisplays[idx] || "";
+        }
+      });
+
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = `${scheduleName || "schedule"}_${new Date().toISOString().split("T")[0]}.png`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+        }
+      }, "image/png");
+
+      setExportDialogOpen(false);
+      setExportFormat("");
+    } catch (error) {
+      console.error("Error exporting image:", error);
+      alert("Failed to export image. Please ensure html2canvas is installed.");
+    }
+  }, [scheduleName]);
+
+  // Handle download button click
+  const handleDownload = useCallback(() => {
+    if (exportFormat === "pdf") {
+      handleExportPDF();
+    } else if (exportFormat === "image") {
+      handleExportImage();
+    }
+  }, [exportFormat, handleExportPDF, handleExportImage]);
 
   // Handle remove subject from schedule
   const handleRemoveSubject = useCallback((subject) => {
@@ -316,7 +462,7 @@ export default function Schedule({
   const renderedCells = useMemo(() => new Set(), []);
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 2, height: "100%" }}>
+    <Box ref={scheduleContainerRef} sx={{ display: "flex", flexDirection: "column", gap: 2, height: "100%" }}>
       {/* Schedule Name & Save Box */}
       <Paper
         sx={{
@@ -366,7 +512,7 @@ export default function Schedule({
             variant="outlined"
             color="primary"
             startIcon={<FileDownloadIcon />}
-            onClick={handleExportSchedule}
+            onClick={handleOpenExportDialog}
             disabled={addedSubjects.length === 0}
             sx={{
               textTransform: "none",
@@ -400,6 +546,7 @@ export default function Schedule({
 
       {/* Main Schedule Timetable */}
       <Paper
+        ref={schedulePaperRef}
         sx={{
           p: 2,
           backgroundColor: "#ffffff",
@@ -591,9 +738,9 @@ export default function Schedule({
                             key={dayIndex}
                             rowSpan={rowSpan}
                             sx={{
-                              backgroundColor: "#9e0807",
-                              borderRight: "1px solid #7a0606",
-                              borderBottom: "1px solid #7a0606",
+                              backgroundColor: "#ebaa32",
+                              borderRight: "1px solid #d29119",
+                              borderBottom: "1px solid #d29119",
                               p: 1,
                               verticalAlign: "middle",
                               textAlign: "center",
@@ -643,7 +790,7 @@ export default function Schedule({
                             >
                               <Typography
                                 variant="body2"
-                                sx={{ fontWeight: 700, color: "#ffffff", mb: 0.5 }}
+                                sx={{ fontWeight: 700, color: "#333333", mb: 0.5 }}
                               >
                                 {subject.subject_code}
                                 {subject.section && (
@@ -654,23 +801,23 @@ export default function Schedule({
                                       ml: 0.5,
                                       height: 18,
                                       fontSize: "0.7rem",
-                                      backgroundColor: "rgba(255, 255, 255, 0.2)",
-                                      color: "#ffffff",
-                                      border: "1px solid rgba(255, 255, 255, 0.3)",
+                                      backgroundColor: "rgba(158, 8, 7, 0.15)",
+                                      color: "#9e0807",
+                                      border: "1px solid rgba(158, 8, 7, 0.3)",
                                     }}
                                   />
                                 )}
                               </Typography>
                               <Typography
                                 variant="caption"
-                                sx={{ color: "rgba(255, 255, 255, 0.9)", display: "block" }}
+                                sx={{ color: "#333333", display: "block" }}
                               >
                                 {parsed.start} - {parsed.end}
                               </Typography>
                               {parsed.room && (
                                 <Typography
                                   variant="caption"
-                                  sx={{ color: "rgba(255, 255, 255, 0.9)", display: "block" }}
+                                  sx={{ color: "#333333", display: "block" }}
                                 >
                                   Room: {parsed.room}
                                 </Typography>
@@ -715,6 +862,111 @@ export default function Schedule({
           </Box>
         )}
       </Paper>
+
+      {/* Export Dialog */}
+      <Dialog
+        open={exportDialogOpen}
+        onClose={handleCloseExportDialog}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 2,
+          },
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: 700, color: "#9e0807", pb: 1 }}>
+          Export Schedule
+        </DialogTitle>
+        <DialogContent>
+          <FormControl component="fieldset" sx={{ width: "100%", mt: 2 }}>
+            <FormLabel component="legend" sx={{ mb: 2, fontWeight: 600, color: "#333" }}>
+              Select Export Format
+            </FormLabel>
+            <RadioGroup
+              value={exportFormat}
+              onChange={(e) => setExportFormat(e.target.value)}
+              sx={{ gap: 1 }}
+            >
+              <FormControlLabel
+                value="pdf"
+                control={
+                  <Radio
+                    sx={{
+                      color: "#9e0807",
+                      "&.Mui-checked": {
+                        color: "#9e0807",
+                      },
+                    }}
+                  />
+                }
+                label={
+                  <Typography sx={{ fontWeight: 500 }}>
+                    PDF
+                    <Typography
+                      component="span"
+                      variant="caption"
+                      sx={{ display: "block", color: "#666", fontWeight: 400 }}
+                    >
+                      Export as PDF document with schedule name
+                    </Typography>
+                  </Typography>
+                }
+              />
+              <FormControlLabel
+                value="image"
+                control={
+                  <Radio
+                    sx={{
+                      color: "#9e0807",
+                      "&.Mui-checked": {
+                        color: "#9e0807",
+                      },
+                    }}
+                  />
+                }
+                label={
+                  <Typography sx={{ fontWeight: 500 }}>
+                    Image (PNG)
+                    <Typography
+                      component="span"
+                      variant="caption"
+                      sx={{ display: "block", color: "#666", fontWeight: 400 }}
+                    >
+                      Export as PNG image file
+                    </Typography>
+                  </Typography>
+                }
+              />
+            </RadioGroup>
+          </FormControl>
+        </DialogContent>
+        <DialogActions sx={{ p: 2.5, pt: 1 }}>
+          <Button
+            onClick={handleCloseExportDialog}
+            sx={{ textTransform: "none", fontWeight: 600, color: "#666" }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleDownload}
+            variant="contained"
+            color="primary"
+            startIcon={<FileDownloadIcon />}
+            disabled={!exportFormat}
+            sx={{
+              textTransform: "none",
+              fontWeight: 600,
+              backgroundColor: "#9e0807",
+              "&:hover": {
+                backgroundColor: "#7a0606",
+              },
+            }}
+          >
+            Download
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }
