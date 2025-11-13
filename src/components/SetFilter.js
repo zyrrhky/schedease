@@ -1,25 +1,34 @@
-// ...existing code...
 import React from "react";
 import {
   Paper,
   Box,
   Typography,
   TextField,
-  FormControl,
-  FormLabel,
-  FormGroup,
-  FormControlLabel,
-  Checkbox,
   Grid,
-  Divider,
   Avatar,
+  Divider,
+  Stack,
+  ToggleButton,
+  Tooltip,
+  IconButton,
 } from "@mui/material";
 import {
   FilterList as FilterIcon,
   AccessTime as TimeIcon,
   EventBusy as ExcludeIcon,
   School as ClassIcon,
+  CleaningServices as ClearFilterIcon,
+  Public as OnlineIcon,
+  Groups as F2FIcon,
+  SwapHoriz as HybridIcon,
 } from "@mui/icons-material";
+
+const CIT = {
+  gold: "#F2B501",
+  goldLight: "#F3CD4E",
+  maroon: "#7A1315",
+  paper: "#FFFDF8",
+};
 
 export default function SetFilter({
   breakBetweenMinutes,
@@ -29,251 +38,220 @@ export default function SetFilter({
   classTypes = [],
   toggleClassType,
 }) {
-  const dayOptions = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const dayOptions = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const dayFull = {
+    Mon: "Monday",
+    Tue: "Tuesday",
+    Wed: "Wednesday",
+    Thu: "Thursday",
+    Fri: "Friday",
+    Sat: "Saturday",
+  };
+
   const classOptions = [
-    { value: "f2f", label: "Face to Face" },
-    { value: "online", label: "Online" },
-    { value: "hybrid", label: "Hybrid" },
+    { value: "f2f", label: "Face to Face", icon: <F2FIcon fontSize="small" /> },
+    { value: "online", label: "Online", icon: <OnlineIcon fontSize="small" /> },
+    { value: "hybrid", label: "Hybrid", icon: <HybridIcon fontSize="small" /> },
   ];
+
+  const handleDayToggle = (d) => toggleExcludeDay(dayFull[d]);
+  const handleClassToggle = (v) => toggleClassType(v);
+
+  const handleClearAll = () => {
+    setBreakBetweenMinutes("");
+    dayOptions.forEach((d) => excludeDays.includes(dayFull[d]) && toggleExcludeDay(dayFull[d]));
+    classOptions.forEach((c) => classTypes.includes(c.value) && toggleClassType(c.value));
+  };
 
   return (
     <Paper
-      elevation={3} // Higher elevation for a more prominent card feel
+      elevation={2}
       sx={{
         mb: 3,
-        p: 4, // Increased padding for spaciousness
-        borderRadius: 3, // Rounded corners for a modern look
-        backgroundColor: "#ffffff", // Clean white background
-        border: "1px solid #e8e8e8", // Subtle border
-        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)", // Custom shadow for depth
+        borderRadius: 3,
+        overflow: "hidden",
+        border: "1px solid rgba(0,0,0,0.05)",
       }}
     >
-      {/* Header with Icon */}
-      <Box display="flex" alignItems="center" mb={2}>
-        <Avatar sx={{ bgcolor: "#ebaa32ff", mr: 2 }}>
-          <FilterIcon />
-        </Avatar>
-        <Typography variant="h5" sx={{ fontWeight: 700, color: "#333" }}>
-          Set Filter
-        </Typography>
+      {/* 🔶 TOP SECTION — Gold background (NOT white) */}
+      <Box
+        sx={{
+          background: `linear-gradient(90deg, ${CIT.goldLight} 0%, ${CIT.gold} 100%)`,
+          p: { xs: 2, md: 3 },
+          pb: 4,
+        }}
+      >
+        {/* Capsule Header */}
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            background: "rgba(255,255,255,0.45)",
+            backdropFilter: "blur(4px)",
+            borderRadius: 50,
+            px: { xs: 2, md: 3 },
+            py: 1.5,
+            boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+          }}
+        >
+          <Box display="flex" alignItems="center" gap={2}>
+            <Avatar
+              sx={{
+                bgcolor: CIT.maroon,
+                width: 52,
+                height: 52,
+                boxShadow: "0 4px 12px rgba(0,0,0,0.25)",
+              }}
+            >
+              <FilterIcon sx={{ color: CIT.goldLight, fontSize: 30 }} />
+            </Avatar>
+
+            <Box>
+              <Typography
+                sx={{
+                  fontWeight: 900,
+                  fontSize: "1.65rem",
+                  color: CIT.maroon,
+                }}
+              >
+                Set Filters
+              </Typography>
+
+              <Typography
+                variant="caption"
+                sx={{
+                  color: CIT.maroon,
+                  opacity: 0.8,
+                  fontWeight: 500,
+                  fontSize: "0.8rem",
+                }}
+              >
+                Narrow down subjects and schedules
+              </Typography>
+            </Box>
+          </Box>
+
+          <Tooltip title="Clear Filters">
+            <IconButton
+              onClick={handleClearAll}
+              sx={{
+                color: CIT.maroon,
+                "&:hover": { background: "rgba(122,19,21,0.15)" },
+              }}
+            >
+              <ClearFilterIcon sx={{ fontSize: 24 }} />
+            </IconButton>
+          </Tooltip>
+        </Box>
       </Box>
-      <Divider sx={{ mb: 3 }} />
 
-      {/* Main Content in a Vertical Stack for Better Structure */}
-      <Box>
-        {/* Break Between Classes Section */}
-        <Box mb={4}>
-          <Box display="flex" alignItems="center" mb={2}>
-            <TimeIcon sx={{ mr: 1, color: "#d29119ff" }} />
-            <Typography variant="h6" sx={{ fontWeight: 600, color: "#555" }}>
-              Break Between Classes
-            </Typography>
-          </Box>
-          <TextField
-            label="Minutes"
-            type="number"
-            value={breakBetweenMinutes}
-            onChange={(e) => setBreakBetweenMinutes(e.target.value)}
-            fullWidth
-            inputProps={{ min: 0 }}
-            variant="outlined"
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                borderRadius: 2,
-              },
-            }}
-          />
-        </Box>
+      {/* 🔶 LOWER SECTION — White content area */}
+      <Box sx={{ p: { xs: 2, md: 3 }, background: CIT.paper }}>
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={6}>
+            <Stack spacing={1.25}>
+              <Box display="flex" alignItems="center" gap={1}>
+                <TimeIcon sx={{ color: CIT.maroon }} />
+                <Typography sx={{ fontWeight: 700, color: CIT.maroon }}>
+                  Break Between Classes
+                </Typography>
+              </Box>
 
-        {/* Exclude Days Section */}
-        <Box mb={4}>
-          <Box display="flex" alignItems="center" mb={2}>
-            <ExcludeIcon sx={{ mr: 1, color: "#d29119ff" }} />
-            <Typography variant="h6" sx={{ fontWeight: 600, color: "#555" }}>
-              Exclude Days
-            </Typography>
-          </Box>
-          <FormGroup>
-            <Grid container spacing={1}>
-              {dayOptions.map((d) => (
-                <Grid item xs={6} sm={4} key={d}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={excludeDays.includes(d)}
-                        onChange={() => toggleExcludeDay(d)}
-                        sx={{
-                          color: "#d29119ff",
-                          "&.Mui-checked": {
-                            color: "#d29119ff",
-                          },
-                        }}
-                      />
-                    }
-                    label={d}
-                    sx={{
-                      "& .MuiFormControlLabel-label": {
-                        fontSize: "0.9rem",
-                      },
-                    }}
-                  />
-                </Grid>
-              ))}
-            </Grid>
-          </FormGroup>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-            Select day(s) to exclude meeting on those days.
-          </Typography>
-        </Box>
+              <TextField
+                label="Minutes"
+                type="number"
+                value={breakBetweenMinutes ?? ""}
+                onChange={(e) =>
+                  setBreakBetweenMinutes(e.target.value === "" ? "" : Number(e.target.value))
+                }
+                fullWidth
+                size="small"
+                helperText="Minimum minutes between classes"
+                sx={{
+                  "& .MuiFormHelperText-root": {
+                    color: CIT.goldLight,
+                    fontSize: "0.75rem",
+                  },
+                }}
+              />
+            </Stack>
+          </Grid>
 
-        {/* Class Types Section */}
-        <Box>
-          <Box display="flex" alignItems="center" mb={2}>
-            <ClassIcon sx={{ mr: 1, color: "#d29119ff" }} />
-            <Typography variant="h6" sx={{ fontWeight: 600, color: "#555" }}>
-              Class Types
-            </Typography>
-          </Box>
-          <FormGroup>
-            <Grid container spacing={1}>
-              {classOptions.map((c) => (
-                <Grid item xs={12} sm={4} key={c.value}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={classTypes.includes(c.value)}
-                        onChange={() => toggleClassType(c.value)}
-                        sx={{
-                          color: "#d29119ff",
-                          "&.Mui-checked": {
-                            color: "#d29119ff",
-                          },
-                        }}
-                      />
-                    }
-                    label={c.label}
-                    sx={{
-                      "& .MuiFormControlLabel-label": {
-                        fontSize: "0.9rem",
-                      },
-                    }}
-                  />
-                </Grid>
-              ))}
-            </Grid>
-          </FormGroup>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-            Select your preferred class type; leave unchecked to accept any.
-          </Typography>
-        </Box>
+          <Grid item xs={12} md={6}>
+            <Stack spacing={1.25}>
+              <Box display="flex" alignItems="center" gap={1}>
+                <ExcludeIcon sx={{ color: CIT.maroon }} />
+                <Typography sx={{ fontWeight: 700, color: CIT.maroon }}>Exclude Days</Typography>
+              </Box>
+
+              <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+                {dayOptions.map((d) => {
+                  const checked = excludeDays.includes(dayFull[d]);
+                  return (
+                    <ToggleButton
+                      key={d}
+                      selected={checked}
+                      onClick={() => handleDayToggle(d)}
+                      value={d}
+                      sx={{
+                        px: 2,
+                        borderRadius: 2,
+                        color: checked ? CIT.maroon : "rgba(0,0,0,0.75)",
+                        background: checked ? `${CIT.gold}33` : "transparent",
+                        "&:hover": { background: checked ? `${CIT.gold}44` : "rgba(0,0,0,0.04)" },
+                      }}
+                    >
+                      {d}
+                    </ToggleButton>
+                  );
+                })}
+              </Box>
+
+              <Typography sx={{ color: CIT.goldLight, fontSize: "0.75rem" }}>
+                Select days to exclude classes.
+              </Typography>
+            </Stack>
+          </Grid>
+
+          <Grid item xs={12}>
+            <Stack spacing={1.25}>
+              <Box display="flex" alignItems="center" gap={1}>
+                <ClassIcon sx={{ color: CIT.maroon }} />
+                <Typography sx={{ fontWeight: 700, color: CIT.maroon }}>Class Types</Typography>
+              </Box>
+
+              <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+                {classOptions.map((opt) => {
+                  const active = classTypes.includes(opt.value);
+                  return (
+                    <ToggleButton
+                      key={opt.value}
+                      selected={active}
+                      onClick={() => handleClassToggle(opt.value)}
+                      sx={{
+                        px: 2,
+                        borderRadius: 2,
+                        textTransform: "none",
+                        color: active ? CIT.maroon : "rgba(0,0,0,0.85)",
+                        background: active ? `${CIT.gold}33` : "transparent",
+                        "&:hover": { background: active ? `${CIT.gold}44` : "rgba(0,0,0,0.04)" },
+                      }}
+                    >
+                      {opt.icon}
+                      {opt.label}
+                    </ToggleButton>
+                  );
+                })}
+              </Box>
+
+              <Typography sx={{ color: CIT.goldLight, fontSize: "0.75rem" }}>
+                Choose preferred delivery types (multi-select).
+              </Typography>
+            </Stack>
+          </Grid>
+        </Grid>
       </Box>
     </Paper>
   );
 }
-
-
-/*
-import React from "react";
-import {
-  Paper,
-  Box,
-  Typography,
-  TextField,
-  FormControl,
-  FormLabel,
-  FormGroup,
-  FormControlLabel,
-  Checkbox,
-  Grid,
-} from "@mui/material";
-
-export default function SetFilter({
-  breakBetweenMinutes,
-  setBreakBetweenMinutes,
-  excludeDays = [],
-  toggleExcludeDay,
-  classTypes = [],
-  toggleClassType,
-}) {
-  const dayOptions = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-  const classOptions = [
-    { value: "f2f", label: "Face to Face" },
-    { value: "online", label: "Online" },
-    { value: "hybrid", label: "Hybrid" },
-  ];
-
-  return (
-    <Paper
-      elevation={1}
-      sx={{
-        mb: 2,
-        p: 2,
-        borderRadius: 3,
-        backgroundColor: "#fff",
-      }}
-    >
-      <Typography variant="h6" sx={{ mb: 1, fontWeight: 700 }}>
-        Set Filter
-      </Typography>
-
-      <Grid container spacing={2}>
-        <Grid item xs={12} sm={4}>
-          <TextField
-            label="Break between classes (minutes) — required"
-            type="number"
-            value={breakBetweenMinutes}
-            onChange={(e) => setBreakBetweenMinutes(e.target.value)}
-            fullWidth
-            inputProps={{ min: 0 }}
-          />
-        </Grid>
-
-        <Grid item xs={12} sm={4}>
-          <FormControl component="fieldset">
-            <FormLabel component="legend">Exclude day(s) (optional)</FormLabel>
-            <FormGroup>
-              {dayOptions.map((d) => (
-                <FormControlLabel
-                  key={d}
-                  control={
-                    <Checkbox
-                      checked={excludeDays.includes(d)}
-                      onChange={() => toggleExcludeDay(d)}
-                    />
-                  }
-                  label={d}
-                />
-              ))}
-            </FormGroup>
-            <Typography variant="caption" color="text.secondary">
-              You may check multiple days to exclude subjects that meet on those days.
-            </Typography>
-          </FormControl>
-        </Grid>
-
-        <Grid item xs={12} sm={4}>
-          <FormControl component="fieldset">
-            <FormLabel component="legend">Class type(s) (optional)</FormLabel>
-            <FormGroup>
-              {classOptions.map((c) => (
-                <FormControlLabel
-                  key={c.value}
-                  control={
-                    <Checkbox
-                      checked={classTypes.includes(c.value)}
-                      onChange={() => toggleClassType(c.value)}
-                    />
-                  }
-                  label={c.label}
-                />
-              ))}
-            </FormGroup>
-            <Typography variant="caption" color="text.secondary">
-              You may select multiple class types; leave all unchecked to accept any.
-            </Typography>
-          </FormControl>
-        </Grid>
-      </Grid>
-    </Paper>
-  );
-}*/
