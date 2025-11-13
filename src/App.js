@@ -6,28 +6,40 @@ import Signup from "./components/auth/Signup";
 import "./App.css";
 
 /**
- * Main App Component with Routing
- * The previous App is transfered to Dashboard.jsx
- * Routes:
- * - /login - Login page
- * - /signup - Signup page
- * - / - Dashboard (main schedule management interface)
- * - /dashboard - Dashboard (redirects to /)
+ * Simple auth check (demo). Replace with real auth later.
  */
+const isAuthenticated = () => !!localStorage.getItem("token");
+
+function RequireAuth({ children }) {
+  if (!isAuthenticated()) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+}
+
 export default function App() {
   return (
     <Router>
       <Routes>
-        {/* Auth Routes */}
+        {/* Auth pages */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        
-        {/* Main Dashboard Route */}
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/dashboard" element={<Navigate to="/" replace />} />
-        
-        {/* Catch-all: redirect to home */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+
+        {/* Root "/" should show the login page */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
+
+        {/* Protected dashboard */}
+        <Route
+          path="/dashboard"
+          element={
+            <RequireAuth>
+              <Dashboard />
+            </RequireAuth>
+          }
+        />
+
+        {/* Fallback: send to login */}
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>
   );

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Box,
@@ -22,55 +22,51 @@ export default function Signup() {
   });
   const [submitError, setSubmitError] = useState("");
 
+  // Redirect to dashboard if already logged in
+  useEffect(() => {
+    if (localStorage.getItem("token")) {
+      navigate("/dashboard", { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const isValidEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
 
-  const isValidPassword = (password) => {
-    // Minimum 6 characters (adjust requirements as needed)
-    return password.length >= 6;
-  };
+  const isValidPassword = (password) => password.length >= 6;
 
-  const isValidUsername = (username) => {
-    // Username should be alphanumeric and underscore, 3-20 characters
-    const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
-    return usernameRegex.test(username);
-  };
+  const isValidUsername = (username) => /^[a-zA-Z0-9_]{3,20}$/.test(username);
 
   const validateForm = () => {
     const newErrors = {};
 
-    // Validate full name
-    if (!values.full_name.trim()) {
+    if (!values.full_name || !values.full_name.trim()) {
       newErrors.full_name = "Full name is required";
     } else if (values.full_name.trim().length < 2) {
       newErrors.full_name = "Full name must be at least 2 characters";
     }
 
-    // Validate email
-    if (!values.email.trim()) {
+    if (!values.email || !values.email.trim()) {
       newErrors.email = "Email is required";
     } else if (!isValidEmail(values.email)) {
       newErrors.email = "Please enter a valid email address";
     }
 
-    // Validate username
-    if (!values.username.trim()) {
+    if (!values.username || !values.username.trim()) {
       newErrors.username = "Username is required";
     } else if (!isValidUsername(values.username)) {
       newErrors.username =
         "Username must be 3-20 characters (letters, numbers, underscore only)";
     }
 
-    // Validate password
     if (!values.password) {
       newErrors.password = "Password is required";
     } else if (!isValidPassword(values.password)) {
       newErrors.password = "Password must be at least 6 characters long";
     }
 
-    // Set errors and return validation result
     Object.keys(newErrors).forEach((key) => setError(key, newErrors[key]));
     return Object.keys(newErrors).length === 0;
   };
@@ -79,30 +75,36 @@ export default function Signup() {
     e.preventDefault();
     setSubmitError("");
 
-    if (!validateForm()) {
-      return;
+    if (!validateForm()) return;
+
+    try {
+      console.log("Signup attempt:", {
+        full_name: values.full_name,
+        email: values.email,
+        username: values.username,
+        password: "[HIDDEN]",
+      });
+
+      // TODO: POST to your API to create account.
+      // For now simulate success:
+      alert("Registration successful! (This is a frontend-only simulation)");
+
+      // go to login page after successful signup
+      navigate("/login", { replace: true });
+
+      // If you prefer to auto-login after signup, use:
+      // localStorage.setItem("token", "demo-token");
+      // navigate("/dashboard", { replace: true });
+    } catch (err) {
+      setSubmitError("An error occurred while registering. Please try again.");
     }
-
-    // Simulate API call - in production...
-    console.log("Signup attempt:", {
-      full_name: values.full_name,
-      email: values.email,
-      username: values.username,
-      password: "[HIDDEN]", 
-    });
-
-    // TODO: Replace with actual API call
-    // For now, simulate successful registration
-    alert("Registration successful! (This is a frontend-only simulation)");
-    // Optionally navigate to login page
-    // navigate('/login');
   };
 
   return (
     <Box
       sx={{
         minHeight: "100vh",
-        bgcolor: "#f2e5ae",         
+        bgcolor: "#f2e5ae",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -114,7 +116,7 @@ export default function Signup() {
           sx={{
             p: 4,
             borderRadius: 3,
-            bgcolor: "#fdfaf0", 
+            bgcolor: "#fdfaf0",
             boxShadow: "0 1px 8px rgba(0,0,0,0.12)",
           }}
         >
@@ -124,7 +126,7 @@ export default function Signup() {
                 variant="h4"
                 sx={{
                   fontWeight: 700,
-                  color: "#9e0807", 
+                  color: "#9e0807",
                   mb: 1,
                   fontFamily: "'Poppins', sans-serif",
                 }}
@@ -222,8 +224,8 @@ export default function Signup() {
                   variant="contained"
                   fullWidth
                   sx={{
-                    bgcolor: "#9e0807", 
-                    "&:hover": { bgcolor: "#7c0605" }, 
+                    bgcolor: "#9e0807",
+                    "&:hover": { bgcolor: "#7c0605" },
                     py: 1.5,
                     textTransform: "none",
                     fontWeight: 600,
@@ -265,4 +267,3 @@ export default function Signup() {
     </Box>
   );
 }
-

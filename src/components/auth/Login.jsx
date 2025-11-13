@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Box,
@@ -20,6 +20,14 @@ export default function Login() {
   });
   const [submitError, setSubmitError] = useState("");
 
+  // Redirect to dashboard if already logged in
+  useEffect(() => {
+    if (localStorage.getItem("token")) {
+      navigate("/dashboard", { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const isValidEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
@@ -28,48 +36,44 @@ export default function Login() {
   const validateForm = () => {
     const newErrors = {};
 
-    // Validate email
-    if (!values.email.trim()) {
+    if (!values.email || !values.email.trim()) {
       newErrors.email = "Email is required";
     } else if (!isValidEmail(values.email)) {
       newErrors.email = "Please enter a valid email address";
     }
 
-    // Validate password
     if (!values.password) {
       newErrors.password = "Password is required";
     }
 
-    // Set errors and return validation result
     Object.keys(newErrors).forEach((key) => setError(key, newErrors[key]));
     return Object.keys(newErrors).length === 0;
   };
-
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setSubmitError("");
 
-    if (!validateForm()) {
-      return;
+    if (!validateForm()) return;
+
+    try {
+      console.log("Login attempt:", { email: values.email, password: "[HIDDEN]" });
+
+      // Simulate saving auth token - replace with real API call
+      localStorage.setItem("token", "demo-token");
+
+      // Navigate to dashboard (not "/") to avoid redirect loop
+      navigate("/dashboard", { replace: true });
+    } catch (err) {
+      setSubmitError("An error occurred while logging in. Please try again.");
     }
-
-    // Simulate API call - in production...
-    console.log("Login attempt:", {
-      email: values.email,
-      password: "[HIDDEN]", 
-    });
-
-    // TODO: Replace with actual API call
-    // For now, simulate successful login
-    alert("Login successful! (This is a frontend-only simulation)");
   };
 
   return (
     <Box
       sx={{
         minHeight: "100vh",
-        bgcolor: "#f2e5ae", 
+        bgcolor: "#f2e5ae",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -81,7 +85,7 @@ export default function Login() {
           sx={{
             p: 4,
             borderRadius: 3,
-            bgcolor: "#fdfaf0", 
+            bgcolor: "#fdfaf0",
             boxShadow: "0 1px 8px rgba(0,0,0,0.12)",
           }}
         >
@@ -91,7 +95,7 @@ export default function Login() {
                 variant="h4"
                 sx={{
                   fontWeight: 700,
-                  color: "#9e0807", 
+                  color: "#9e0807",
                   mb: 1,
                   fontFamily: "'Poppins', sans-serif",
                 }}
@@ -154,8 +158,8 @@ export default function Login() {
                   variant="contained"
                   fullWidth
                   sx={{
-                    bgcolor: "#9e0807", 
-                    "&:hover": { bgcolor: "#7c0605" }, 
+                    bgcolor: "#9e0807",
+                    "&:hover": { bgcolor: "#7c0605" },
                     py: 1.5,
                     textTransform: "none",
                     fontWeight: 600,
@@ -196,4 +200,3 @@ export default function Login() {
     </Box>
   );
 }
-
