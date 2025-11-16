@@ -133,7 +133,7 @@ export default function Dashboard() {
   }, [dataList, handleDeleteData, removeSubjectFromSchedules]);
 
   return (
-    <Box className="App" sx={{ minHeight: "100vh", bgcolor: "#f2e5ae" }}>
+    <Box className="App" sx={{ minHeight: "100vh", bgcolor: "#fff6db" }}>
       <Header onMenu={() => setSidebarOpen(true)} cartCount={scheduleList.length} />
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} onNavigate={() => setSidebarOpen(false)} />
 
@@ -164,14 +164,15 @@ export default function Dashboard() {
           <Box
             sx={{
               flex: 3.2,
-              bgcolor: "#fdfaf0",
+              bgcolor: "#fffef7",
               borderRadius: 3,
-              boxShadow: "0 1px 8px rgba(0,0,0,0.12)",
+              boxShadow: "0 2px 12px rgba(158, 8, 7, 0.08)",
               p: 3,
               minHeight: 640,
               width: "100%",
               display: "flex",
               flexDirection: "column",
+              border: "1px solid rgba(244, 197, 34, 0.15)",
             }}
           >
             <Typography variant="h5" sx={{ fontWeight: 700, mb: 1 }}>
@@ -194,9 +195,9 @@ export default function Dashboard() {
           <Box
             sx={{
               flex: 1,
-              bgcolor: "#fdfaf0",
+              bgcolor: "#fffef7",
               borderRadius: 3,
-              boxShadow: "0 1px 8px rgba(0,0,0,0.12)",
+              boxShadow: "0 2px 12px rgba(158, 8, 7, 0.08)",
               p: 2.5,
               height: scheduleHeight ? `${scheduleHeight}px` : "640px",
               minHeight: scheduleHeight ? `${scheduleHeight}px` : 640,
@@ -204,6 +205,7 @@ export default function Dashboard() {
               overflowY: "auto",
               width: "100%",
               boxSizing: "border-box",
+              border: "1px solid rgba(244, 197, 34, 0.15)",
             }}
           >
             <SubjectList
@@ -286,7 +288,7 @@ export default function Dashboard() {
   const openSubjects = useMemo(() => (dataList || []).filter((d) => !d.is_closed), [dataList]);
 
   return (
-    <Box className="App" sx={{ minHeight: "100vh", bgcolor: "#f2e5ae" }}>
+    <Box className="App" sx={{ minHeight: "100vh", bgcolor: "#f5f5f5" }}>
       <Header onMenu={() => setSidebarOpen(true)} cartCount={scheduleList.length} />
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} onNavigate={() => setSidebarOpen(false)} />
 
@@ -306,14 +308,15 @@ export default function Dashboard() {
           <Box
             sx={{
               flex: 3.2,
-              bgcolor: "#fdfaf0",
+              bgcolor: "#fffef7",
               borderRadius: 3,
-              boxShadow: "0 1px 8px rgba(0,0,0,0.12)",
+              boxShadow: "0 2px 12px rgba(158, 8, 7, 0.08)",
               p: 3,
               minHeight: 640,
               width: "100%",
               display: "flex",
               flexDirection: "column",
+              border: "1px solid rgba(244, 197, 34, 0.15)",
             }}
           >
             <Typography variant="h5" sx={{ fontWeight: 700, mb: 1 }}>
@@ -451,7 +454,7 @@ export default function App() {
   }, [dataList, handleDeleteData, removeSubjectFromSchedules]);
 
   return (
-    <Box className="App" sx={{ minHeight: "100vh", bgcolor: "#f2e5ae" }}>
+    <Box className="App" sx={{ minHeight: "100vh", bgcolor: "#f5f5f5" }}>
       <Header onMenu={() => setSidebarOpen(true)} cartCount={scheduleList.length} />
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} onNavigate={() => setSidebarOpen(false)} />
 
@@ -482,14 +485,15 @@ export default function App() {
           <Box
             sx={{
               flex: 3.2,
-              bgcolor: "#fdfaf0",
+              bgcolor: "#fffef7",
               borderRadius: 3,
-              boxShadow: "0 1px 8px rgba(0,0,0,0.12)",
+              boxShadow: "0 2px 12px rgba(158, 8, 7, 0.08)",
               p: 3,
               minHeight: 640,
               width: "100%",
               display: "flex",
               flexDirection: "column",
+              border: "1px solid rgba(244, 197, 34, 0.15)",
             }}
           >
             <Typography variant="h5" sx={{ fontWeight: 700, mb: 1 }}>
