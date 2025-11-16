@@ -4,7 +4,7 @@
 html, body, #root { height: 100%; }
 body {
   margin: 0;
-  background-color: #f2e5ae; /* Pale Yellow */
+  background-color: #fff6db; /* Warm Light Gold */
   font-family: 'Poppins', sans-serif;
   color: #000000;
 }
@@ -12,4 +12,4 @@ body {
 /* small helpers */
 .container-centered { max-width: 980px; margin: 24px auto; padding: 16px; }
 .import-textarea { width: 100%; min-height: 180px; font-family: monospace; font-size: 13px; padding: 12px; border-radius: 8px; border: 1px solid rgba(0,0,0,0.1); }
-.subject-row { padding: 10px; border-radius: 8px; background: #fff; margin-bottom: 8px; border-left: 6px solid #9e0807; }
+.subject-row { padding: 10px; border-radius: 8px; background: #ffffff; margin-bottom: 8px; border-left: 6px solid #9e0807; }

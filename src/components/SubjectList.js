@@ -135,7 +135,7 @@ export default function SubjectList({
     >
       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", p: 2, bgcolor: "#f5f5f5" }}>
         <Box display="flex" alignItems="center">
-          <Avatar sx={{ bgcolor: "#ebaa32ff", mr: 2 }}>
+          <Avatar sx={{ bgcolor: "#f4c522", mr: 2 }}>
             <SchoolIcon />
           </Avatar>
           <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, color: "#9e0807" }}>
@@ -194,7 +194,7 @@ export default function SubjectList({
           const chip = modalityChipProps(modality);
 
           // icon color matches Add button: red when not added, gray when added
-          const iconColor = isAdded ? "#9e9e9e" : "#d32f2f";
+          const iconColor = isAdded ? "#9e9e9e" : "#9e0807";
           const iconSize = 20; // slightly larger
 
           return (
@@ -244,7 +244,7 @@ export default function SubjectList({
                     {schedule && (
                       <Box mb={2}>
                         <Box display="flex" alignItems="center" mb={1}>
-                          <ScheduleIcon sx={{ mr: 1, color: "#ebaa32ff" }} />
+                          <ScheduleIcon sx={{ mr: 1, color: "#f4c522" }} />
                           <Typography variant="body2" sx={{ fontWeight: 700, color: "#555" }}>
                             Schedule
                           </Typography>
@@ -259,7 +259,7 @@ export default function SubjectList({
                     {(room || usageText || (typeof assessed === "number")) && (
                       <Box mb={2}>
                         <Box display="flex" alignItems="center" mb={1}>
-                          <RoomIcon sx={{ mr: 1, color: "#ebaa32ff" }} />
+                          <RoomIcon sx={{ mr: 1, color: "#f4c522" }} />
                           <Typography variant="body2" sx={{ fontWeight: 700, color: "#555" }}>
                             Details
                           </Typography>
@@ -273,8 +273,7 @@ export default function SubjectList({
                           {usageText && (
                             <Typography variant="body2" sx={{ color: "#333", fontSize: "0.85rem" }}>
                               <strong>Enrolled:</strong> <span style={{ fontWeight: 400 }}>{usageText}</span>
-                            </Typography>
-                          )}
+                            </Typography>                          )}
                           {typeof assessed === "number" && (
                             <Typography variant="body2" sx={{ color: "#333", fontSize: "0.85rem" }}>
                               <strong>Assessed:</strong> <span style={{ fontWeight: 400 }}>{assessed}</span>
@@ -328,10 +327,25 @@ export default function SubjectList({
                               textTransform: "none",
                               fontWeight: 700,
                               minWidth: 84,
+                              borderRadius: 2,
+                              fontFamily: "'Poppins', sans-serif",
+                              ...(isAdded 
+                                ? { 
+                                    backgroundColor: "#9e9e9e", 
+                                    color: "#fff",
+                                    "&:hover": { backgroundColor: "#757575" }
+                                  }
+                                : {
+                                    backgroundColor: "#9e0807",
+                                    color: "#ffffff",
+                                    "&:hover": { 
+                                      backgroundColor: "#7a0606",
+                                      boxShadow: "0 2px 8px rgba(244, 197, 34, 0.3)"
+                                    }
+                                  }
+                              ),
                             }}
                             variant="contained"
-                            color={isAdded ? "inherit" : "error"}
-                            style={isAdded ? { backgroundColor: "#9e9e9e", color: "#fff" } : undefined}
                           >
                             {isAdded ? "Added" : "Add"}
                           </Button>

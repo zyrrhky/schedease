@@ -73,11 +73,12 @@ export default function Login() {
     <Box
       sx={{
         minHeight: "100vh",
-        bgcolor: "#f2e5ae",
+        bgcolor: "#fff6db",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         py: 4,
+        backgroundImage: "linear-gradient(135deg, #fff6db 0%, #fff2c2 100%)",
       }}
     >
       <Container maxWidth="sm">
@@ -85,11 +86,30 @@ export default function Login() {
           sx={{
             p: 4,
             borderRadius: 3,
-            bgcolor: "#fdfaf0",
-            boxShadow: "0 1px 8px rgba(0,0,0,0.12)",
+            bgcolor: "#fffef7",
+            boxShadow: "0 4px 16px rgba(158, 8, 7, 0.08)",
+            border: "1px solid rgba(244, 197, 34, 0.2)",
           }}
         >
           <Stack spacing={3}>
+            {/* Logo Section */}
+            <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 2, mb: 2 }}>
+              <img 
+                src="/SchedEase-logo.png" 
+                alt="SchedEase Logo" 
+                style={{ width: "48px", height: "48px" }}
+              />
+              <img 
+                src="/cit-logo.png" 
+                alt="CIT-U Logo" 
+                style={{ 
+                  height: "50px", 
+                  width: "auto",
+                  objectFit: "contain",
+                }}
+              />
+            </Box>
+
             <Box>
               <Typography
                 variant="h4"
@@ -98,6 +118,7 @@ export default function Login() {
                   color: "#9e0807",
                   mb: 1,
                   fontFamily: "'Poppins', sans-serif",
+                  textAlign: "center",
                 }}
               >
                 Login
@@ -107,9 +128,10 @@ export default function Login() {
                 sx={{
                   color: "#666",
                   fontFamily: "'Poppins', sans-serif",
+                  textAlign: "center",
                 }}
               >
-                Sign in to access your schedule
+                Sign in to manage your schedules
               </Typography>
             </Box>
 

@@ -467,9 +467,10 @@ export default function Schedule({
       <Paper
         sx={{
           p: 3,
-          backgroundColor: "#ffffff",
+          backgroundColor: "#fffef7",
           borderRadius: 2,
-          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+          boxShadow: "0 2px 8px rgba(158, 8, 7, 0.08)",
+          border: "1px solid rgba(244, 197, 34, 0.15)",
         }}
       >
         <Typography variant="h6" sx={{ mb: 2, fontWeight: 700, color: "#333" }}>
@@ -526,7 +527,7 @@ export default function Schedule({
         </Stack>
         
         {/* Status Indicator */}
-        <Box sx={{ mt: 2, pt: 2, borderTop: "1px solid #e0e0e0" }}>
+        <Box sx={{ mt: 2, pt: 2, borderTop: "1px solid rgba(244, 197, 34, 0.2)" }}>
           <Typography
             variant="body2"
             sx={{
@@ -549,9 +550,10 @@ export default function Schedule({
         ref={schedulePaperRef}
         sx={{
           p: 2,
-          backgroundColor: "#ffffff",
+          backgroundColor: "#fffef7",
           borderRadius: 2,
-          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+          boxShadow: "0 2px 8px rgba(158, 8, 7, 0.08)",
+          border: "1px solid rgba(244, 197, 34, 0.15)",
           flex: 1,
           overflow: "auto",
         }}
@@ -738,7 +740,7 @@ export default function Schedule({
                             key={dayIndex}
                             rowSpan={rowSpan}
                             sx={{
-                              backgroundColor: "#ebaa32",
+                              backgroundColor: "#f4c522",
                               borderRight: "1px solid #d29119",
                               borderBottom: "1px solid #d29119",
                               p: 1,

@@ -28,17 +28,45 @@ export default function Sidebar({ open = false, onClose = () => {}, onNavigate =
 
   return (
     <Drawer anchor="left" open={!!open} onClose={onClose}>
-      <Box sx={{ width: 280, p: 1, height: "100%", display: "flex", flexDirection: "column" }}>
-        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1 }}>
-          <Typography variant="h6" sx={{ fontWeight: 700 }}>
+      <Box sx={{ 
+        width: 280, 
+        p: 2, 
+        height: "100%", 
+        display: "flex", 
+        flexDirection: "column",
+        bgcolor: "#fffef7",
+      }}>
+        <Box sx={{ 
+          display: "flex", 
+          alignItems: "center", 
+          justifyContent: "space-between", 
+          mb: 2,
+          pb: 2,
+          borderBottom: "2px solid rgba(244, 197, 34, 0.2)",
+        }}>
+          <Typography 
+            variant="h6" 
+            sx={{ 
+              fontWeight: 700,
+              color: "#9e0807",
+              fontFamily: "'Poppins', sans-serif",
+            }}
+          >
             Menu
           </Typography>
-          <IconButton onClick={onClose} size="small">
+          <IconButton 
+            onClick={onClose} 
+            size="small"
+            sx={{
+              color: "#9e0807",
+              "&:hover": { backgroundColor: "rgba(158, 8, 7, 0.1)" },
+            }}
+          >
             <CloseIcon />
           </IconButton>
         </Box>
 
-        <Divider sx={{ mb: 1 }} />
+        <Divider sx={{ mb: 2 }} />
 
         <List>
           {items.map((it) => (
@@ -49,15 +77,31 @@ export default function Sidebar({ open = false, onClose = () => {}, onNavigate =
                 onNavigate?.(it.key);
                 onClose?.();
               }}
+              sx={{
+                borderRadius: 2,
+                mb: 0.5,
+                "&:hover": {
+                  backgroundColor: "rgba(244, 197, 34, 0.15)",
+                },
+              }}
             >
-              <ListItemIcon>{it.icon}</ListItemIcon>
-              <ListItemText primary={it.label} />
+              <ListItemIcon sx={{ color: "#9e0807", minWidth: 40 }}>
+                {it.icon}
+              </ListItemIcon>
+              <ListItemText 
+                primary={it.label}
+                primaryTypographyProps={{
+                  fontFamily: "'Poppins', sans-serif",
+                  fontWeight: 500,
+                  color: "#333",
+                }}
+              />
             </ListItem>
           ))}
         </List>
 
         <Box sx={{ mt: "auto" }}>
-          <Divider sx={{ mb: 1 }} />
+          <Divider sx={{ mb: 2, mt: 2 }} />
           <ListItem
             button
             onClick={() => {
@@ -66,11 +110,24 @@ export default function Sidebar({ open = false, onClose = () => {}, onNavigate =
               navigate("/login", { replace: true });
               onClose?.();
             }}
+            sx={{
+              borderRadius: 2,
+              "&:hover": {
+                backgroundColor: "rgba(244, 67, 54, 0.1)",
+              },
+            }}
           >
-            <ListItemIcon>
+            <ListItemIcon sx={{ color: "#f44336", minWidth: 40 }}>
               <LogoutIcon />
             </ListItemIcon>
-            <ListItemText primary="Logout" />
+            <ListItemText 
+              primary="Logout"
+              primaryTypographyProps={{
+                fontFamily: "'Poppins', sans-serif",
+                fontWeight: 500,
+                color: "#f44336",
+              }}
+            />
           </ListItem>
         </Box>
       </Box>

@@ -12,11 +12,11 @@ import { SystemUpdateAlt as ImportIcon } from "@mui/icons-material";
 import { parsePlain, normalizeRecord } from "../utils/parse";
 
 const COLORS = {
-  navy: "#1A2A40",
-  blueAccent: "#275EFE",
-  softBlue: "#AEC6FF",
-  iceWhite: "#F6F8FF",
-  paper: "#FFFFFF",
+  primary: "#9e0807",           
+  primaryAccent: "#9e0807",    
+  gold: "#f4c522",             
+  lightGray: "#f5f5f5",        
+  white: "#ffffff",            
 };
 
 export default function ImportData({ onCreateMany, disableImport = false }) {
@@ -55,27 +55,25 @@ export default function ImportData({ onCreateMany, disableImport = false }) {
         borderRadius: 3,
         overflow: "hidden",
         border: "1px solid rgba(0,0,0,0.05)",
-        backgroundColor: COLORS.paper,
+        backgroundColor: COLORS.white,
       }}
       elevation={2}
     >
       {/* TOP CAPSULE HEADER - capsule now full-width */}
       <Box
         sx={{
-          background: `linear-gradient(135deg, ${COLORS.softBlue} 0%, ${COLORS.blueAccent} 100%)`,
+          background: `linear-gradient(135deg, ${COLORS.gold} 0%, ${COLORS.primary} 100%)`,
           p: { xs: 2, md: 3 },
           pb: 4.5,
         }}
       >
         <Box
           sx={{
-            // Make the white capsule stretch to available width,
-            // while keeping comfortable horizontal padding inside the gradient area.
             width: "100%",
             boxSizing: "border-box",
             display: "flex",
             alignItems: "center",
-            background: COLORS.iceWhite,
+            background: COLORS.lightGray,
             borderRadius: 40,
             px: { xs: 2, md: 3 },
             py: 1.25,
@@ -86,13 +84,13 @@ export default function ImportData({ onCreateMany, disableImport = false }) {
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             <Avatar
               sx={{
-                bgcolor: COLORS.navy,
+                bgcolor: COLORS.primary,
                 width: 56,
                 height: 56,
                 boxShadow: "0 3px 8px rgba(0,0,0,0.18)",
               }}
             >
-              <ImportIcon sx={{ color: COLORS.softBlue, fontSize: 28 }} />
+              <ImportIcon sx={{ color: COLORS.gold, fontSize: 28 }} />
             </Avatar>
 
             <Box>
@@ -100,7 +98,7 @@ export default function ImportData({ onCreateMany, disableImport = false }) {
                 sx={{
                   fontWeight: 900,
                   fontSize: "1.55rem",
-                  color: COLORS.navy,
+                  color: COLORS.primary,
                   letterSpacing: "0.5px",
                 }}
               >
@@ -110,7 +108,7 @@ export default function ImportData({ onCreateMany, disableImport = false }) {
               <Typography
                 variant="caption"
                 sx={{
-                  color: COLORS.navy,
+                  color: COLORS.primary,
                   opacity: 0.75,
                   fontSize: "0.85rem",
                 }}
@@ -120,22 +118,21 @@ export default function ImportData({ onCreateMany, disableImport = false }) {
             </Box>
           </Box>
 
-          {/* optional right-side space or controls — kept empty to match your screenshot */}
           <Box sx={{ flex: 1 }} />
         </Box>
       </Box>
 
       {/* BODY */}
-      <Box sx={{ p: { xs: 2, md: 3 }, backgroundColor: COLORS.paper }}>
+      <Box sx={{ p: { xs: 2, md: 3 }, backgroundColor: "#fffef7" }}>
         <Stack spacing={2}>
           <Box>
             <Typography variant="body2" sx={{ color: "#333", mb: 1.25, lineHeight: 1.6 }}>
-              Go to <b>AIMS → Subject Offering</b>, search the subject, then copy & paste the rows. Use this exact column order:
+              Go to <b>AIMS → Section Offering</b>, search the subject, then copy & paste the rows. Use this exact column order:
             </Typography>
 
             <Box
               sx={{
-                backgroundColor: COLORS.iceWhite,
+                backgroundColor: "#fff6db",
                 borderRadius: 2,
                 border: "1px solid rgba(0,0,0,0.08)",
                 py: 1.2,
@@ -152,7 +149,13 @@ export default function ImportData({ onCreateMany, disableImport = false }) {
               }}
             >
               {headers.map((h, i) => (
-                <Box key={i} sx={{ flex: i === 3 ? "1.4" : i === 6 ? "1.5" : "1", textAlign: "left" }}>
+                <Box
+                  key={i}
+                  sx={{
+                    flex: i === 3 ? "1.4" : i === 6 ? "1.5" : "1",
+                    textAlign: "left",
+                  }}
+                >
                   {h}
                 </Box>
               ))}
@@ -179,8 +182,8 @@ export default function ImportData({ onCreateMany, disableImport = false }) {
               variant="outlined"
               onClick={handleClear}
               sx={{
-                borderColor: COLORS.navy,
-                color: COLORS.navy,
+                borderColor: COLORS.primary,
+                color: COLORS.primary,
                 textTransform: "none",
                 fontWeight: 600,
                 borderRadius: 2,
@@ -195,8 +198,8 @@ export default function ImportData({ onCreateMany, disableImport = false }) {
               disabled={disabled}
               onClick={handleImport}
               sx={{
-                bgcolor: COLORS.navy,
-                "&:hover": { bgcolor: "#122033" },
+                bgcolor: COLORS.primary,
+                "&:hover": { bgcolor: "#7a0506" },
                 px: 3,
                 py: 1,
                 textTransform: "none",
