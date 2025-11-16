@@ -21,10 +21,18 @@ export default function Sidebar({ open = false, onClose = () => {}, onNavigate =
   const navigate = useNavigate();
 
   const items = [
-    { key: "data", label: "Import Data", icon: <StorageIcon /> },
-    { key: "schedule", label: "Saved Schedule", icon: <CalendarTodayIcon /> },
-    { key: "compare", label: "Compare Schedule", icon: <CompareArrowsIcon /> },
+    { key: "dashboard", label: "Import Data", icon: <StorageIcon />, path: "/dashboard" },
+    { key: "schedule", label: "Saved Schedule", icon: <CalendarTodayIcon />, path: "/saved-schedules" },
+    { key: "compare", label: "Compare Schedule", icon: <CompareArrowsIcon />, path: "/dashboard" },
   ];
+
+  const handleNavigation = (item) => {
+    if (item.path) {
+      navigate(item.path);
+    }
+    onNavigate?.(item.key);
+    onClose?.();
+  };
 
   return (
     <Drawer anchor="left" open={!!open} onClose={onClose}>
@@ -73,10 +81,7 @@ export default function Sidebar({ open = false, onClose = () => {}, onNavigate =
             <ListItem
               button
               key={it.key}
-              onClick={() => {
-                onNavigate?.(it.key);
-                onClose?.();
-              }}
+              onClick={() => handleNavigation(it)}
               sx={{
                 borderRadius: 2,
                 mb: 0.5,

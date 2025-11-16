@@ -11,7 +11,7 @@ import {
   Switch
 } from "@mui/material";
 
-export default function DataForm({ open = false, initial = null, onClose = () => {}, onSave = () => {} }) {
+export default function DataForm({ open = false, initial = null, onClose = () => {}, onSave = () => {}, existingSubjects = [] }) {
   const [form, setForm] = useState({
     data_id: null,
     number: "",
@@ -27,6 +27,7 @@ export default function DataForm({ open = false, initial = null, onClose = () =>
     assessed: "",
     is_closed: false
   });
+  const [titleError, setTitleError] = useState("");
 
   useEffect(() => {
     if (initial) {
@@ -52,17 +53,51 @@ export default function DataForm({ open = false, initial = null, onClose = () =>
 
   function change(k, v) {
     setForm((s) => ({ ...s, [k]: v }));
+    // Clear title error when user modifies the title
+    if (k === "subject_title") {
+      setTitleError("");
+    }
   }
 
   function handleSave() {
+    // Validate that subject_title is not empty
+    const trimmedTitle = (form.subject_title || "").trim();
+    if (!trimmedTitle) {
+      setTitleError("Subject title is required");
+      return;
+    }
+    
+    // Check for duplicates (exclude current subject being edited)
+    const trimmedTitleLower = trimmedTitle.toLowerCase();
+    const isDuplicate = existingSubjects.some((subject) => {
+      const existingTitle = (subject.subject_title || "").trim().toLowerCase();
+      const isSameId = String(subject.data_id) === String(form.data_id);
+      return existingTitle === trimmedTitleLower && !isSameId;
+    });
+    
+    if (isDuplicate) {
+      setTitleError("A subject with this title already exists");
+      return;
+    }
+
     const out = {
       ...form,
+      subject_title: trimmedTitle, // Use trimmed title
       credited_units: form.credited_units === "" ? null : Number(form.credited_units),
       total_slots: form.total_slots === "" ? null : Number(form.total_slots),
       enrolled: form.enrolled === "" ? null : Number(form.enrolled),
       assessed: form.assessed === "" ? null : Number(form.assessed)
     };
-    onSave(out);
+    
+    const result = onSave(out);
+    
+    // Check if save was successful (in case hook also validates)
+    if (result && !result.success) {
+      setTitleError(result.error || "Failed to save subject");
+      return;
+    }
+    
+    setTitleError("");
     onClose();
   }
 
@@ -103,7 +138,15 @@ export default function DataForm({ open = false, initial = null, onClose = () =>
           </Grid>
 
           <Grid item xs={12}>
-            <TextField label="Subject Title" value={form.subject_title} fullWidth onChange={(e) => change("subject_title", e.target.value)} />
+            <TextField 
+              label="Subject Title" 
+              value={form.subject_title} 
+              fullWidth 
+              onChange={(e) => change("subject_title", e.target.value)}
+              error={!!titleError}
+              helperText={titleError}
+              required
+            />
           </Grid>
 
           <Grid item xs={6} md={3}>

@@ -48,21 +48,20 @@ export default function SubjectList({
 
   const toggleAdded = (it) => {
     const id = String(it.data_id ?? `${it.subject_code}-${it.section || ""}`);
-    setAddedSet((prev) => {
-      const next = new Set(prev);
-      const willBeAdded = !next.has(id);
-      if (willBeAdded) next.add(id);
-      else next.delete(id);
-      // notify parent if provided
-      try {
-        onAdd?.(it, willBeAdded);
-      } catch (e) {
-        // ignore callback errors
-        // eslint-disable-next-line no-console
-        console.error(e);
-      }
-      return next;
-    });
+    const wasAdded = addedSet.has(id);
+    const willBeAdded = !wasAdded;
+    
+    // Notify parent first if provided - parent can reject the action
+    try {
+      onAdd?.(it, willBeAdded);
+    } catch (e) {
+      // ignore callback errors
+      // eslint-disable-next-line no-console
+      console.error(e);
+    }
+    
+    // Note: The actual state update will happen via the useEffect
+    // that syncs with addedIds prop from parent
   };
 
   // small helper to infer modality for display

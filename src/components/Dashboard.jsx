@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback } from "react";
+import React, { useMemo, useState, useCallback, useEffect } from "react";
 import { Container, Box, Typography, Snackbar, Alert } from "@mui/material";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
@@ -49,7 +49,14 @@ export default function Dashboard() {
 
   const handleSaveEditedWrapper = useCallback(
     (item) => {
-      handleSaveEdited(item);
+      const result = handleSaveEdited(item);
+      if (result && !result.success) {
+        // Show error message
+        setSnackMsg(result.error || "Failed to save subject");
+        setSnackSeverity("error");
+        setSnackOpen(true);
+        return;
+      }
       setEditOpen(false);
       setEditing(null);
     },
@@ -72,24 +79,60 @@ export default function Dashboard() {
 
   const openSubjects = useMemo(() => (dataList || []).filter((d) => !d.is_closed), [dataList]);
 
-  // Track added subjects for the schedule
-  const [addedSubjectIds, setAddedSubjectIds] = useState(new Set());
+  // Track added subjects for the schedule with localStorage persistence
+  const [addedSubjectIds, setAddedSubjectIds] = useState(() => {
+    try {
+      const stored = localStorage.getItem("schedease_added_subjects");
+      if (stored) {
+        return new Set(JSON.parse(stored));
+      }
+    } catch (error) {
+      console.error("Failed to load added subjects from localStorage:", error);
+    }
+    return new Set();
+  });
+
+  // Persist added subjects to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem("schedease_added_subjects", JSON.stringify(Array.from(addedSubjectIds)));
+    } catch (error) {
+      console.error("Failed to save added subjects to localStorage:", error);
+    }
+  }, [addedSubjectIds]);
   
   // Track Schedule box height to match SubjectList
   const [scheduleHeight, setScheduleHeight] = useState(null);
 
   const handleSubjectAdd = useCallback((item, isAdded) => {
     const id = String(item.data_id ?? `${item.subject_code}-${item.section || ""}`);
+    const itemTitle = (item.subject_title || "").trim().toLowerCase();
+    
     setAddedSubjectIds((prev) => {
       const next = new Set(prev);
+      
       if (isAdded) {
+        // Check if a subject with the same title is already added
+        const alreadyAddedSameTitle = dataList.some((subject) => {
+          const subjectId = String(subject.data_id ?? `${subject.subject_code}-${subject.section || ""}`);
+          const subjectTitle = (subject.subject_title || "").trim().toLowerCase();
+          return prev.has(subjectId) && subjectTitle === itemTitle && subjectId !== id;
+        });
+        
+        if (alreadyAddedSameTitle) {
+          setSnackMsg("Cannot add duplicate subject: A subject with this title is already in the schedule");
+          setSnackSeverity("error");
+          setSnackOpen(true);
+          return prev; // Don't modify the set
+        }
+        
         next.add(id);
       } else {
         next.delete(id);
       }
       return next;
     });
-  }, []);
+  }, [dataList]);
 
   const [snackOpen, setSnackOpen] = useState(false);
   const [snackMsg, setSnackMsg] = useState("");
@@ -99,16 +142,34 @@ export default function Dashboard() {
     (parsedArray = []) => {
       const filtered = filterSubjects(parsedArray || []);
       if ((filtered || []).length > 0) {
+        const beforeCount = dataList.length;
         handleAddMany(filtered);
-        setSnackMsg(`Successfully added ${filtered.length} subject(s) matching the filter`);
-        setSnackSeverity("success");
+        // Use setTimeout to check after state update
+        setTimeout(() => {
+          const afterCount = dataList.length;
+          const addedCount = afterCount - beforeCount;
+          const skippedCount = filtered.length - addedCount;
+          
+          if (addedCount > 0) {
+            let msg = `Successfully added ${addedCount} subject(s)`;
+            if (skippedCount > 0) {
+              msg += ` (${skippedCount} skipped due to duplicate titles)`;
+            }
+            setSnackMsg(msg);
+            setSnackSeverity("success");
+          } else if (skippedCount > 0) {
+            setSnackMsg(`All ${skippedCount} subject(s) were skipped (duplicate titles already exist)`);
+            setSnackSeverity("warning");
+          }
+          setSnackOpen(true);
+        }, 100);
       } else {
         setSnackMsg("No subjects matched the active filters. Adjust filters or clear them and try again.");
         setSnackSeverity("warning");
+        setSnackOpen(true);
       }
-      setSnackOpen(true);
     },
-    [filterSubjects, handleAddMany]
+    [filterSubjects, handleAddMany, dataList.length]
   );
 
   const handleClearAll = useCallback(() => {
@@ -227,7 +288,13 @@ export default function Dashboard() {
         </Box>
       </Container>
 
-      <DataForm open={editOpen} initial={editing} onClose={() => setEditOpen(false)} onSave={handleSaveEditedWrapper} />
+      <DataForm 
+        open={editOpen} 
+        initial={editing} 
+        onClose={() => setEditOpen(false)} 
+        onSave={handleSaveEditedWrapper}
+        existingSubjects={dataList}
+      />
 
       <Snackbar
         open={snackOpen}

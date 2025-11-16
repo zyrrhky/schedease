@@ -86,10 +86,7 @@ export default function Signup() {
       });
 
       // TODO: POST to your API to create account.
-      // For now simulate success:
-      alert("Registration successful! (This is a frontend-only simulation)");
-
-      // go to login page after successful signup
+      // For now simulate success and go to login page
       navigate("/login", { replace: true });
 
       // If you prefer to auto-login after signup, use:
