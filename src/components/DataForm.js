@@ -67,9 +67,30 @@ export default function DataForm({ open = false, initial = null, onClose = () =>
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle>{form.data_id ? "Edit Subject" : "Add Subject"}</DialogTitle>
-      <DialogContent dividers>
+    <Dialog 
+      open={open} 
+      onClose={onClose} 
+      maxWidth="md" 
+      fullWidth
+      PaperProps={{
+        sx: {
+          borderRadius: 3,
+          boxShadow: "0 4px 16px rgba(158, 8, 7, 0.08)",
+          bgcolor: "#fffef7",
+        }
+      }}
+    >
+      <DialogTitle 
+        sx={{ 
+          fontWeight: 700,
+          color: "#9e0807",
+          fontFamily: "'Poppins', sans-serif",
+          borderBottom: "1px solid rgba(244, 197, 34, 0.2)",
+        }}
+      >
+        {form.data_id ? "Edit Subject" : "Add Subject"}
+      </DialogTitle>
+      <DialogContent dividers sx={{ bgcolor: "#fffef7" }}>
         <Grid container spacing={2}>
           <Grid item xs={12} md={4}>
             <TextField label="Offering Dept" value={form.offering_dept} fullWidth onChange={(e) => change("offering_dept", e.target.value)} />
@@ -114,9 +135,31 @@ export default function DataForm({ open = false, initial = null, onClose = () =>
         </Grid>
       </DialogContent>
 
-      <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button variant="contained" onClick={handleSave}>Save</Button>
+      <DialogActions sx={{ p: 2.5, bgcolor: "#fffef7", borderTop: "1px solid rgba(244, 197, 34, 0.2)" }}>
+        <Button 
+          onClick={onClose}
+          sx={{
+            textTransform: "none",
+            fontWeight: 600,
+            color: "#666",
+            fontFamily: "'Poppins', sans-serif",
+          }}
+        >
+          Cancel
+        </Button>
+        <Button 
+          variant="contained" 
+          onClick={handleSave}
+          sx={{
+            textTransform: "none",
+            fontWeight: 600,
+            backgroundColor: "#9e0807",
+            "&:hover": { backgroundColor: "#7a0606" },
+            fontFamily: "'Poppins', sans-serif",
+          }}
+        >
+          Save
+        </Button>
       </DialogActions>
     </Dialog>
   );

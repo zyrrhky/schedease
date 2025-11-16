@@ -24,10 +24,10 @@ import {
 } from "@mui/icons-material";
 
 const CIT = {
-  gold: "#F2B501",
-  goldLight: "#F3CD4E",
-  maroon: "#7A1315",
-  paper: "#FFFDF8",
+  gold: "#f4c522",
+  goldLight: "#f4c522",
+  maroon: "#9e0807",
+  paper: "#ffffff",
 };
 
 export default function SetFilter({
@@ -73,7 +73,6 @@ export default function SetFilter({
         border: "1px solid rgba(0,0,0,0.05)",
       }}
     >
-      {/* 🔶 TOP SECTION — Gold background (NOT white) */}
       <Box
         sx={{
           background: `linear-gradient(90deg, ${CIT.goldLight} 0%, ${CIT.gold} 100%)`,
@@ -146,8 +145,7 @@ export default function SetFilter({
         </Box>
       </Box>
 
-      {/* 🔶 LOWER SECTION — White content area */}
-      <Box sx={{ p: { xs: 2, md: 3 }, background: CIT.paper }}>
+      <Box sx={{ p: { xs: 2, md: 3 }, background: "#fffef7" }}>
         <Grid container spacing={3}>
           <Grid item xs={12} md={6}>
             <Stack spacing={1.25}>
