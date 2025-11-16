@@ -3,12 +3,18 @@ import { createTheme } from "@mui/material/styles";
 
 const theme = createTheme({
   palette: {
-    primary: { main: "#9e0807" },        // Deep Red
-    secondary: { main: "#f6b492" },      // Warm Peach
-    background: { default: "#f2e5ae" },  // Pale Yellow background
+    primary: { main: "#9e0807" },        // Maroon (Primary)
+    secondary: { main: "#f4c522" },      // Gold (replaced old #ebaa32)
+    background: { 
+      default: "#fff6db",                // Warm Light Gold background
+      paper: "#fffef7",                  // Gold-tinted white for papers
+    },
     text: {
-      primary: "#000000",
-      secondary: "#9e0807",
+      primary: "#000000",                // Black
+      secondary: "#9e0807",              // Maroon
+    },
+    warning: {
+      main: "#f4c522",                   // Gold for warnings/accents
     },
   },
   typography: {
