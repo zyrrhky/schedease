@@ -9,6 +9,7 @@ import DataForm from "./DataForm";
 import useSubjects from "../hooks/useSubjects";
 import useSchedules from "../hooks/useSchedules";
 import useFilters from "../hooks/useFilters";
+import { userKey } from "../utils/storage";
 import SetFilter from "./SetFilter";
 import "../App.css";
 
@@ -79,27 +80,26 @@ export default function Dashboard() {
 
   const openSubjects = useMemo(() => (dataList || []).filter((d) => !d.is_closed), [dataList]);
 
-  // Track added subjects for the schedule with localStorage persistence
+  // Track added subjects for the schedule with localStorage persistence (per-user)
+  const ADDED_KEY = userKey("schedease_added_subjects");
   const [addedSubjectIds, setAddedSubjectIds] = useState(() => {
     try {
-      const stored = localStorage.getItem("schedease_added_subjects");
-      if (stored) {
-        return new Set(JSON.parse(stored));
-      }
+      const stored = localStorage.getItem(ADDED_KEY);
+      if (stored) return new Set(JSON.parse(stored));
     } catch (error) {
       console.error("Failed to load added subjects from localStorage:", error);
     }
     return new Set();
   });
 
-  // Persist added subjects to localStorage
+  // Persist added subjects to localStorage per-user
   useEffect(() => {
     try {
-      localStorage.setItem("schedease_added_subjects", JSON.stringify(Array.from(addedSubjectIds)));
+      localStorage.setItem(ADDED_KEY, JSON.stringify(Array.from(addedSubjectIds)));
     } catch (error) {
       console.error("Failed to save added subjects to localStorage:", error);
     }
-  }, [addedSubjectIds]);
+  }, [addedSubjectIds, ADDED_KEY]);
   
   // Track Schedule box height to match SubjectList
   const [scheduleHeight, setScheduleHeight] = useState(null);

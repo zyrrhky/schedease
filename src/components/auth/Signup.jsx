@@ -11,6 +11,7 @@ import {
   Stack,
 } from "@mui/material";
 import useForm from "../../hooks/useForm";
+import { loadUsers, saveUsers, setCurrentUserId } from "../../utils/storage";
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -85,8 +86,24 @@ export default function Signup() {
         password: "[HIDDEN]",
       });
 
-      // TODO: POST to your API to create account.
-      // For now simulate success and go to login page
+      // Local demo users store
+      const users = loadUsers();
+      // check duplicates
+      if (users.some((u) => u.username === values.username || u.email === values.email)) {
+        setSubmitError("Username or email already exists");
+        return;
+      }
+
+      const newUser = {
+        username: values.username,
+        email: values.email,
+        password: values.password, // demo only - do NOT store plain passwords in production
+        full_name: values.full_name,
+      };
+      users.push(newUser);
+      saveUsers(users);
+
+      // After signup, navigate to login so the user can sign in
       navigate("/login", { replace: true });
 
       // If you prefer to auto-login after signup, use:

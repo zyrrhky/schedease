@@ -110,8 +110,9 @@ export default function Sidebar({ open = false, onClose = () => {}, onNavigate =
           <ListItem
             button
             onClick={() => {
-              // clear auth and go to login
+              // clear auth and current user, then go to login
               localStorage.removeItem("token");
+              localStorage.removeItem("schedease_current_user");
               navigate("/login", { replace: true });
               onClose?.();
             }}

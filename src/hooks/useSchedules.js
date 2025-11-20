@@ -1,25 +1,26 @@
 import { useState, useCallback, useEffect } from "react";
 import { nextId } from "../utils/ids";
+import { userKey } from "../utils/storage";
 
-const SCHEDULES_STORAGE_KEY = "schedease_schedules";
+const SCHEDULES_STORAGE_BASE = "schedease_schedules";
 
-// Load schedules from localStorage
+// Load schedules from localStorage for current user
 function loadSchedulesFromStorage() {
   try {
-    const stored = localStorage.getItem(SCHEDULES_STORAGE_KEY);
-    if (stored) {
-      return JSON.parse(stored);
-    }
+    const key = userKey(SCHEDULES_STORAGE_BASE);
+    const stored = localStorage.getItem(key);
+    if (stored) return JSON.parse(stored);
   } catch (error) {
     console.error("Failed to load schedules from localStorage:", error);
   }
   return [];
 }
 
-// Save schedules to localStorage
+// Save schedules to localStorage for current user
 function saveSchedulesToStorage(schedules) {
   try {
-    localStorage.setItem(SCHEDULES_STORAGE_KEY, JSON.stringify(schedules));
+    const key = userKey(SCHEDULES_STORAGE_BASE);
+    localStorage.setItem(key, JSON.stringify(schedules));
   } catch (error) {
     console.error("Failed to save schedules to localStorage:", error);
   }

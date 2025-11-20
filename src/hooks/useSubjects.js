@@ -1,25 +1,26 @@
 import { useState, useCallback, useEffect } from "react";
 import { nextId } from "../utils/ids";
+import { userKey } from "../utils/storage";
 
-const SUBJECTS_STORAGE_KEY = "schedease_subjects";
+const SUBJECTS_STORAGE_BASE = "schedease_subjects";
 
-// Load subjects from localStorage
+// Load subjects from localStorage for current user
 function loadSubjectsFromStorage() {
   try {
-    const stored = localStorage.getItem(SUBJECTS_STORAGE_KEY);
-    if (stored) {
-      return JSON.parse(stored);
-    }
+    const key = userKey(SUBJECTS_STORAGE_BASE);
+    const stored = localStorage.getItem(key);
+    if (stored) return JSON.parse(stored);
   } catch (error) {
     console.error("Failed to load subjects from localStorage:", error);
   }
   return [];
 }
 
-// Save subjects to localStorage
+// Save subjects to localStorage for current user
 function saveSubjectsToStorage(subjects) {
   try {
-    localStorage.setItem(SUBJECTS_STORAGE_KEY, JSON.stringify(subjects));
+    const key = userKey(SUBJECTS_STORAGE_BASE);
+    localStorage.setItem(key, JSON.stringify(subjects));
   } catch (error) {
     console.error("Failed to save subjects to localStorage:", error);
   }
@@ -40,18 +41,16 @@ export default function useSubjects(initial = []) {
   const addMany = useCallback((parsedArray = []) => {
     setSubjects((prev) => {
       const existing = new Set(prev.map((d) => String(d.data_id)));
-      
-      const mapped = parsedArray
-        .map((p) => {
-          let id = String(p.data_id || "");
-          if (!id || existing.has(id)) {
-            do {
-              id = nextId("data");
-            } while (existing.has(id));
-          }
-          existing.add(id);
-          return { ...p, data_id: id };
-        });
+      const mapped = parsedArray.map((p) => {
+        let id = String(p.data_id || "");
+        if (!id || existing.has(id)) {
+          do {
+            id = nextId("data");
+          } while (existing.has(id));
+        }
+        existing.add(id);
+        return { ...p, data_id: id };
+      });
       return prev.concat(mapped);
     });
   }, []);

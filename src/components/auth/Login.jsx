@@ -11,6 +11,7 @@ import {
   Stack,
 } from "@mui/material";
 import useForm from "../../hooks/useForm";
+import { loadUsers, setCurrentUserId } from "../../utils/storage";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -59,8 +60,17 @@ export default function Login() {
     try {
       console.log("Login attempt:", { email: values.email, password: "[HIDDEN]" });
 
+      // Demo: validate against local users store
+      const users = loadUsers();
+      const user = users.find((u) => u.email === (values.email || ""));
+      if (!user || user.password !== values.password) {
+        setSubmitError("Invalid email or password");
+        return;
+      }
+
       // Simulate saving auth token - replace with real API call
       localStorage.setItem("token", "demo-token");
+      setCurrentUserId(user.username || user.email);
 
       // Navigate to dashboard (not "/") to avoid redirect loop
       navigate("/dashboard", { replace: true });
