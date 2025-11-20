@@ -106,21 +106,21 @@ export default function Dashboard() {
 
   const handleSubjectAdd = useCallback((item, isAdded) => {
     const id = String(item.data_id ?? `${item.subject_code}-${item.section || ""}`);
-    const itemTitle = (item.subject_title || "").trim().toLowerCase();
+    const itemSubjectCode = (item.subject_code || "").trim().toUpperCase();
     
     setAddedSubjectIds((prev) => {
       const next = new Set(prev);
       
       if (isAdded) {
-        // Check if a subject with the same title is already added
-        const alreadyAddedSameTitle = dataList.some((subject) => {
+        // Check if a subject with the same subject code is already added
+        const alreadyAddedSameCode = dataList.some((subject) => {
           const subjectId = String(subject.data_id ?? `${subject.subject_code}-${subject.section || ""}`);
-          const subjectTitle = (subject.subject_title || "").trim().toLowerCase();
-          return prev.has(subjectId) && subjectTitle === itemTitle && subjectId !== id;
+          const subjectCode = (subject.subject_code || "").trim().toUpperCase();
+          return prev.has(subjectId) && subjectCode === itemSubjectCode && subjectId !== id;
         });
         
-        if (alreadyAddedSameTitle) {
-          setSnackMsg("Cannot add duplicate subject: A subject with this title is already in the schedule");
+        if (alreadyAddedSameCode) {
+          setSnackMsg(`Cannot add duplicate subject: A subject with code ${itemSubjectCode} is already in the schedule`);
           setSnackSeverity("error");
           setSnackOpen(true);
           return prev; // Don't modify the set
@@ -142,34 +142,17 @@ export default function Dashboard() {
     (parsedArray = []) => {
       const filtered = filterSubjects(parsedArray || []);
       if ((filtered || []).length > 0) {
-        const beforeCount = dataList.length;
         handleAddMany(filtered);
-        // Use setTimeout to check after state update
-        setTimeout(() => {
-          const afterCount = dataList.length;
-          const addedCount = afterCount - beforeCount;
-          const skippedCount = filtered.length - addedCount;
-          
-          if (addedCount > 0) {
-            let msg = `Successfully added ${addedCount} subject(s)`;
-            if (skippedCount > 0) {
-              msg += ` (${skippedCount} skipped due to duplicate titles)`;
-            }
-            setSnackMsg(msg);
-            setSnackSeverity("success");
-          } else if (skippedCount > 0) {
-            setSnackMsg(`All ${skippedCount} subject(s) were skipped (duplicate titles already exist)`);
-            setSnackSeverity("warning");
-          }
-          setSnackOpen(true);
-        }, 100);
+        setSnackMsg(`Successfully added ${filtered.length} subject(s)`);
+        setSnackSeverity("success");
+        setSnackOpen(true);
       } else {
         setSnackMsg("No subjects matched the active filters. Adjust filters or clear them and try again.");
         setSnackSeverity("warning");
         setSnackOpen(true);
       }
     },
-    [filterSubjects, handleAddMany, dataList.length]
+    [filterSubjects, handleAddMany]
   );
 
   const handleClearAll = useCallback(() => {
@@ -179,13 +162,13 @@ export default function Dashboard() {
       setSnackOpen(true);
       return;
     }
-    dataList.forEach((d) => {
+    for (const d of dataList) {
       const id = d.data_id ?? null;
       if (id != null) {
         handleDeleteData(id);
         removeSubjectFromSchedules(id);
       }
-    });
+    }
     // Clear added subjects
     setAddedSubjectIds(new Set());
     setSnackMsg(`Deleted ${dataList.length} subject(s)`);
@@ -280,8 +263,8 @@ export default function Dashboard() {
               totalImported={dataList.length}
               filtersActive={Boolean(
                 breakBetweenMinutes ||
-                (excludeDays && excludeDays.length) ||
-                (classTypes && classTypes.length)
+                excludeDays?.length ||
+                classTypes?.length
               )}
             />
           </Box>

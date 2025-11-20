@@ -40,20 +40,8 @@ export default function useSubjects(initial = []) {
   const addMany = useCallback((parsedArray = []) => {
     setSubjects((prev) => {
       const existing = new Set(prev.map((d) => String(d.data_id)));
-      const existingTitles = new Set(
-        prev.map((d) => (d.subject_title || "").trim().toLowerCase()).filter(Boolean)
-      );
       
       const mapped = parsedArray
-        .filter((p) => {
-          // Filter out subjects with duplicate titles
-          const title = (p.subject_title || "").trim().toLowerCase();
-          if (!title || existingTitles.has(title)) {
-            return false;
-          }
-          existingTitles.add(title);
-          return true;
-        })
         .map((p) => {
           let id = String(p.data_id || "");
           if (!id || existing.has(id)) {
