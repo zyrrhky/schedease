@@ -23,7 +23,7 @@ export default function Sidebar({ open = false, onClose = () => {}, onNavigate =
   const items = [
     { key: "dashboard", label: "Import Data", icon: <StorageIcon />, path: "/dashboard" },
     { key: "schedule", label: "Saved Schedule", icon: <CalendarTodayIcon />, path: "/saved-schedules" },
-    { key: "compare", label: "Compare Schedule", icon: <CompareArrowsIcon />, path: "/dashboard" },
+    { key: "compare", label: "Compare Schedule", icon: <CompareArrowsIcon />, path: "/compare-schedules" },
   ];
 
   const handleNavigation = (item) => {

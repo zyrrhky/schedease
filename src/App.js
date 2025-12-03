@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Dashboard from "./components/Dashboard";
 import SavedSchedules from "./components/SavedSchedules";
+import CompareSchedules from "./components/CompareSchedules";
 import Login from "./components/auth/Login";
 import Signup from "./components/auth/Signup";
 import "./App.css";
@@ -45,6 +46,16 @@ export default function App() {
           element={
             <RequireAuth>
               <SavedSchedules />
+            </RequireAuth>
+          }
+        />
+
+        {/* Protected compare schedules */}
+        <Route
+          path="/compare-schedules"
+          element={
+            <RequireAuth>
+              <CompareSchedules />
             </RequireAuth>
           }
         />
