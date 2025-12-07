@@ -104,16 +104,16 @@ export default function Login() {
           <Stack spacing={3}>
             {/* Logo Section */}
             <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 2, mb: 2 }}>
-              <img 
-                src="/SchedEase-logo.png" 
-                alt="SchedEase Logo" 
+              <img
+                src="/favicon.ico"
+                alt="SchedEase Logo"
                 style={{ width: "48px", height: "48px" }}
               />
-              <img 
-                src="/cit-logo.png" 
-                alt="CIT-U Logo" 
-                style={{ 
-                  height: "50px", 
+              <img
+                src="/cit-logo.png"
+                alt="CIT-U Logo"
+                style={{
+                  height: "50px",
                   width: "auto",
                   objectFit: "contain",
                 }}
