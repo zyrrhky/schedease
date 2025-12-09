@@ -745,7 +745,7 @@ export default function CompareSchedules() {
                     },
                   }}
                 >
-                  View Comparison
+                  Compare
                 </Button>
 
                 {schedules.length === 0 && (
